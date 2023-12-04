@@ -1,5 +1,13 @@
 import { Revenue } from './definitions';
+import { invoices, customers } from './placeholder-data';
 
+export const getCustomInvoices = () => {
+  let newArry = [];
+  customers.forEach((item, index) => {
+    newArry.push({ ...item, ...invoices[index] });
+  });
+  return newArry;
+};
 export const formatCurrency = (amount: number) => {
   return (amount / 100).toLocaleString('en-US', {
     style: 'currency',

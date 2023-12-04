@@ -1,8 +1,12 @@
 import Image from 'next/image';
 import { UpdateInvoice, DeleteInvoice } from '@/app/ui/invoices/buttons';
 import InvoiceStatus from '@/app/ui/invoices/status';
-import { formatDateToLocal, formatCurrency } from '@/app/lib/utils';
-import { fetchFilteredInvoices } from '@/app/lib/data';
+import {
+  formatDateToLocal,
+  formatCurrency,
+  getCustomInvoices,
+} from '@/app/lib/utils';
+// import { fetchFilteredInvoices } from '@/app/lib/data';
 
 export default async function InvoicesTable({
   query,
@@ -11,7 +15,17 @@ export default async function InvoicesTable({
   query: string;
   currentPage: number;
 }) {
-  const invoices = await fetchFilteredInvoices(query, currentPage);
+  const invoices = await new Promise((res) => {
+    let filteredInvoices = getCustomInvoices()?.filter((item) => {
+      if (query) {
+        if (item?.name?.includes(query)) return item;
+        if (item?.email?.includes(query)) return item;
+        return false;
+      } else return item;
+    });
+    res(filteredInvoices);
+  });
+  // const invoices = fetchFilteredInvoices(query, currentPage,);
 
   return (
     <div className="mt-6 flow-root">
@@ -27,11 +41,11 @@ export default async function InvoicesTable({
                   <div>
                     <div className="mb-2 flex items-center">
                       <Image
-                        src={invoice.image_url}
+                        src={invoice?.image_url}
                         className="mr-2 rounded-full"
                         width={28}
                         height={28}
-                        alt={`${invoice.name}'s profile picture`}
+                        alt={`${invoice?.name}'s profile picture`}
                       />
                       <p>{invoice.name}</p>
                     </div>
@@ -90,6 +104,7 @@ export default async function InvoicesTable({
                         className="rounded-full"
                         width={28}
                         height={28}
+                        alt={``}
                       />
                       <p>{invoice.name}</p>
                     </div>
